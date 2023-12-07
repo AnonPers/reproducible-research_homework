@@ -1,6 +1,8 @@
-library(readr)
-install.packages("janitor")
+#install.packages(c("janitor","ggplot2", "readr", "scales")
 library(janitor)
+library(ggplot2)
+library(readr)
+library(scales)
 
 ds_virus_data <- read_csv("question-5-data/Cui_etal2014.csv")
 View(ds_virus_data)
@@ -58,7 +60,6 @@ exp(7.0748)
 
 #plotting logged relationship with regression line 
 
-library(scales)
 
 ggplot(logged_length_volume_data, aes(x = log_genome_length, 
                                       y = log_virion_volume)) +
@@ -70,11 +71,17 @@ ggplot(logged_length_volume_data, aes(x = log_genome_length,
   ) +
   theme_bw() 
 
-#estimated volume of 300kb dsDNA virus 
+##estimating volume of 300kb dsDNA virus :
+
+#creating new data frame with log of new genome length
 
 new_genome_length <- data.frame(log_genome_length = log(300))
 
+#using predict function to get estimate of the volume from new genome length from linear model
+
 predict(linear_model_volume_length, new_genome_length) #output - 15.71733
+
+#need to use exp of the output obtained to get the actual volume 
 
 estimated_volume <- exp(15.71733)
 
