@@ -1,6 +1,6 @@
 # Reproducible research: version control and R
 
-## Answers
+##   INSERT ANSWERS HERE 
 
 ***Q 1-3 Answers link :***
 
@@ -18,6 +18,15 @@ At the beginning of the time step, below 200, both plots show that the random wa
 
 It should be mentioned that running the code will produce different plots every time, so I have provided an image of the plots that I observed.
 
+
+
+
+<img width="993" alt="Screenshot 2023-12-06 at 21 08 01" src="https://github.com/AnonPers/reproducible-research_homework/assets/150166853/08820ded-6927-46fb-a890-9b5ffa4e2dbf">
+
+
+
+
+
 -   *Investigate the term **random seeds**. What is a random seed and how does it work? (5 points)*
 
 Random seeds are numerical values, used to initialise the random number generator (RNG) state for random number generation in R. True randomness if difficult to achieve in statistical and computer modelling, so often RNGs are used to generate number sequences that appear random. These sequences of numbers are based on these initial 'random seeds'. In the context of models that use randomness, such as Brownian motion simulation, random seeds initialise the RNGs that generate random output values. These random seeds can be set using the 'set.seed( )' function in R, meaning that once the seed is set (setting a set of numerical values for input), any subsequent calls to functions that generate random numbers will provide an output of the same sequence of random numbers every time it is ran, given the same seed. This means if we have models that use randomness, by setting the seed the output of the model will always be the same every time we run the code. In the case of the previous question, setting the seed would mean the 'question-4-code' is run, the random_walk simulated/plotted would be the same every time. Setting random seeds is really important for reproducibility, as it provides the same output for the same code every time, meaning other users of your R code can reproduce your results, or you can recreate your own analysis in future.
@@ -27,6 +36,28 @@ Random seeds are numerical values, used to initialise the random number generato
 Script edit seen in answer to below question
 
 -   Go to your commit history and click on the latest commit. Show the edit you made to the code in the comparison view (add this image to the **README.md** of the fork). (5 points)
+
+
+Code on the red shows the original code. Code on the green background shows the changes I made to the code to make a reproducible simulation of Brownian motion.
+
+
+
+
+<img width="616" alt="Screenshot 2023-12-07 at 13 20 14" src="https://github.com/AnonPers/reproducible-research_homework/assets/150166853/878ced2c-469b-4e08-a472-3a4b823036c2">
+<img width="615" alt="Screenshot 2023-12-07 at 13 20 42" src="https://github.com/AnonPers/reproducible-research_homework/assets/150166853/ef1a688b-ced2-453b-893d-342ebd827304">
+
+
+<img width="615" alt="Screenshot 2023-12-07 at 13 22 00" src="https://github.com/AnonPers/reproducible-research_homework/assets/150166853/a77fd323-9c14-4b84-b1f9-a27105c40b4d">
+<img width="614" alt="Screenshot 2023-12-07 at 13 22 29" src="https://github.com/AnonPers/reproducible-research_homework/assets/150166853/29b2bac3-bf8d-4f88-84b7-108d0594efa5">
+
+<img width="614" alt="Screenshot 2023-12-07 at 13 22 39" src="https://github.com/AnonPers/reproducible-research_homework/assets/150166853/dfa381df-2b00-47da-a5e1-d0c02fe0c928">
+
+
+
+
+
+
+
 
 ***Question 5 :***
 
@@ -42,7 +73,38 @@ You can apply a log transformation to fit a linear model to the data. This is be
 
 So I can make the relationship linear by logging the allometric equation : Log(V) = log(β) + αlog(L).
 
-I subset the data to create a data frame only including virion length and genome size, and then applied a log transformation, which can be seen in the "Question_5_code.R" file, but I have also provided an image of my code.
+I subset the data to create a data frame only including virion length and genome size, and then applied a log transformation, code of which is below : 
+
+```
+library(readr)
+install.packages("janitor")
+library(janitor)
+
+ds_virus_data <- read_csv("question-5-data/Cui_etal2014.csv")
+View(ds_virus_data)
+
+#Cleaning the column names in "ds_virus_data" to make them human and computer readable 
+
+cleaned_virus_data <- ds_virus_data %>%
+  clean_names()
+
+#subsetting data to only include genome length and virion volume 
+
+length_volume_virus_data <- cleaned_virus_data[, c("genome_length_kb", "virion_volume_nm_nm_nm")]
+
+#applying log transformation to the subset data
+
+length_volume_virus_data$log_genome_length <- log(length_volume_virus_data$genome_length_kb)
+length_volume_virus_data$log_virion_volume <- log(length_volume_virus_data$virion_volume_nm_nm_nm)
+
+#putting the logged transformed genome length and virion volume into a new data set 
+
+logged_length_volume_data <- data.frame(
+  log_genome_length = log(length_volume_virus_data$genome_length_kb),
+  log_virion_volume = log(length_volume_virus_data$virion_volume_nm_nm_nm)
+)
+
+```
 
 -   *Find the exponent (*$\alpha$*) and scaling factor (*$\beta$*) of the allometric law for dsDNA viruses and write the p-values from the model you obtained, are they statistically significant? Compare the values you found to those shown in **Table 2** of the paper, did you find the same values? (10 points)*
 
@@ -54,34 +116,35 @@ In table 2 of the paper provided, it appears I found the same values for the all
 
 -   *Write the code to reproduce the figure shown below. (10 points)*
 
+  
+```
 library(scales)
 
 library(ggplot2)
 
-ggplot(logged_length_volume_data, aes(x = log_genome_length, y = log_virion_volume)) + geom_point() + geom_smooth(method = "lm", se = TRUE, color = "blue") +\
+ggplot(logged_length_volume_data, aes(x = log_genome_length, y = log_virion_volume)) + geom_point() + geom_smooth(method = "lm", se = TRUE, color = "blue") +
 labs( x = expression(bold("log[Genome length (kb)]")), y = expression(bold("log[Virion volume (nm3)]")) ) + theme_bw()
-
-```         
-<p align="center">
-
-<img src="https://github.com/josegabrielnb/reproducible-research_homework/blob/main/question-5-data/allometric_scaling.png" width="600" height="500"/>
-
-</p>
 ```
+
 
 -   *What is the estimated volume of a 300 kb dsDNA virus? (4 points)*
 
 In order to find the estimated volume of a 300 kb dsDNA virus, I needed to first create a new data frame of the log of this new genome length :
 
-new_genome_length \<- data.frame(log_genome_length = log(300))
+```
+new_genome_length <- data.frame(log_genome_length = log(300))
+```
 
 Then I used the predict function to predict the estimated volume from the linear model I made for earlier questions in Q5 :
 
+```
 predict(linear_model_volume_length, new_genome_length)
+```
 
 The output I gained was 15.71733. As the genome length was logged, I had to do e^15.71733^ to gain the actual estimated volume.
 
 From these steps I found for a genome length of 300 kb, the estimated volume of the ds DNA virus was 6698070 nm^3^.
+
 
 ## Instructions
 
